@@ -1,5 +1,5 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1 # 👈 REQUIRED for Rollouts
+kind: Rollout
 metadata:
   name: bankapp
 spec:
@@ -7,6 +7,14 @@ spec:
   selector:
     matchLabels:
       app: bankapp
+  # 🚦 THE CANARY STRATEGY (GOD LEVEL)
+  strategy:
+    canary:
+      steps:
+      - setWeight: 10
+      - pause: { duration: 10m } # Wait 10 mins for "Smoke Tests"
+      - setWeight: 50
+      - pause: { duration: 5m }
   template:
     metadata:
       labels:
@@ -17,7 +25,6 @@ spec:
         image: bankapp:placeholder
         ports:
         - containerPort: 8080
-        # 🏥 HEALTH CHECKS ADDED HERE
         livenessProbe:
           httpGet:
             path: /health

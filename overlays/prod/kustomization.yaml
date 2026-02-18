@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+# PROD SPECIAL: Change 1 Pod to 3 Pods for High Availability! 🚀
+patches:
+- target:
+    kind: Deployment
+    name: bankapp
+  patch: |-
+    - op: replace
+      path: /spec/replicas
+      value: 3
+
+# Prod Config
+configMapGenerator:
+- name: bankapp-config
+  literals:
+    - db_url="jdbc:mysql://RDS_PROD_ENDPOINT:3306/bankappdb"
+
+# Fixed Stable Version
+images:
+- name: bankapp:placeholder
+  newName: YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/bankapp
+  newTag: v1.0.0-stable

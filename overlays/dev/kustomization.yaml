@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base # 👈 This tells it to use the Master Blueprint!
+
+# This creates your ConfigMap automatically
+configMapGenerator:
+- name: bankapp-config
+  literals:
+    - db_url="jdbc:mysql://RDS_DEV_ENDPOINT:3306/bankappdb"
+
+# The "Sniper" command for your CI pipeline
+images:
+- name: bankapp:placeholder # Look for this image in the Base...
+  newName: YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/bankapp # ...and swap it!
+  newTag: dev-latest
